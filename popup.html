@@ -32,12 +32,33 @@
       <section class="settings-section">
         <h2>Settings</h2>
         <div class="form-group">
-          <label for="defaultAction">Default action:</label>
-          <select id="defaultAction">
-            <option value="copy">Copy to clipboard</option>
-            <option value="replace">Replace text (when possible)</option>
-          </select>
+          <label>Default action:</label>
+          <div class="checkbox-group">
+            <label class="radio-label">
+              <input type="radio" name="defaultAction" value="copy" checked>
+              Copy to clipboard
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="defaultAction" value="replace">
+              Replace text (when possible)
+            </label>
+          </div>
         </div>
+        
+        <div class="form-group">
+          <label>Model:</label>
+          <div class="checkbox-group">
+            <label class="radio-label">
+              <input type="radio" name="modelType" value="claude-3-5-haiku-latest" checked>
+              Fast & Efficient (cheaper)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="modelType" value="claude-3-7-sonnet-latest">
+              Smart & Powerful (more expensive)
+            </label>
+          </div>
+        </div>
+        
         <div class="info-text">
           <p><strong>Note:</strong> Text replacement only works in editable fields like text inputs and textareas.</p>
         </div>
