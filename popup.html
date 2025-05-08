@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Text Modifier Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Claude Text Modifier</h1>
+    </header>
+    
+    <main>
+      <section class="api-key-section">
+        <h2>API Settings</h2>
+        <div class="form-group">
+          <label for="apiKey">Claude API Key:</label>
+          <div class="input-group">
+            <input type="password" id="apiKey" placeholder="Enter your Claude API key">
+            <button id="toggleApiKey" title="Show/Hide API Key">👁️</button>
+          </div>
+          <div class="api-status" id="apiStatus"></div>
+        </div>
+        <div class="form-buttons">
+          <button id="saveApiKey" class="primary-button">Save API Key</button>
+          <button id="testApiKey">Test Connection</button>
+        </div>
+      </section>
+      
+      <section class="settings-section">
+        <h2>Settings</h2>
+        <div class="form-group">
+          <label for="defaultAction">Default action:</label>
+          <select id="defaultAction">
+            <option value="copy">Copy to clipboard</option>
+            <option value="replace">Replace text (when possible)</option>
+          </select>
+        </div>
+        <div class="info-text">
+          <p><strong>Note:</strong> Text replacement only works in editable fields like text inputs and textareas.</p>
+        </div>
+      </section>
+      
+      <section class="instructions">
+        <h2>How to Use</h2>
+        <ol>
+          <li>Select text on any webpage</li>
+          <li>Right-click and choose "Modify with Claude"</li>
+          <li>Select the modification type</li>
+          <li>Wait for Claude to process your text</li>
+          <li>The modified text will replace the selection or be copied to your clipboard</li>
+        </ol>
+      </section>
+    </main>
+    
+    <footer>
+      <div class="status-message" id="statusMessage"></div>
+      <div class="version">v1.0</div>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
