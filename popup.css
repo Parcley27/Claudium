@@ -3,7 +3,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  
+
 }
 
 body {
@@ -26,7 +26,7 @@ body {
 
 /* Header Styles */
 header {
-  background-color: #5436DA;
+  background-color: #3f66b3;
   color: white;
   padding: 15px;
   text-align: center;
@@ -154,14 +154,14 @@ button:hover {
 }
 
 .primary-button {
-  background-color: #5436DA;
+  background-color: #3f66b3;
   color: white;
   border: none;
 
 }
 
 .primary-button:hover {
-  background-color: #4527c3;
+  background-color: #325496;
 
 }
 

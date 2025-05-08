@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Text Modifier Settings</title>
+  <title>Claudium Settings</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Claude Text Modifier</h1>
+      <h1>Claudium</h1>
+      <h3>Claude Based Text Modifier</h3>
     </header>
     
     <main>
@@ -27,10 +28,15 @@
           <button id="saveApiKey" class="primary-button">Save API Key</button>
           <button id="testApiKey">Test Connection</button>
         </div>
+
+        <div class="info-text">
+          <p><strong>Note:</strong> For security reasons, the API key is cleared after every update.</p>
+        </div>
+
       </section>
       
       <section class="settings-section">
-        <h2>Settings</h2>
+        <h2>Behaviour Settings</h2>
         <div class="form-group">
           <label>Default action:</label>
           <div class="checkbox-group">
@@ -50,11 +56,11 @@
           <div class="checkbox-group">
             <label class="radio-label">
               <input type="radio" name="modelType" value="claude-3-5-haiku-latest" checked>
-              Fast & Efficient (cheaper)
+              Fast & Efficient (Haiku, cheaper)
             </label>
             <label class="radio-label">
               <input type="radio" name="modelType" value="claude-3-7-sonnet-latest">
-              Smart & Powerful (more expensive)
+              Smart & Powerful (Sonnet, more expensive)
             </label>
           </div>
         </div>
