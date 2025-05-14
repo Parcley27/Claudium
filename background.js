@@ -16,7 +16,8 @@ chrome.runtime.onInstalled.addListener(() => {
     { id: 'simplify', title: 'Simplify text' },
     { id: 'formalize', title: 'Make text more formal' },
     { id: 'casual', title: 'Make text more casual' },
-    { id: 'custom', title: 'Indicate custom instructions like |this|'}
+    { id: 'answer', title: 'Answer question' },
+    { id: 'custom', title: 'Use custom |instructions|'}
 
   ];
 
@@ -61,39 +62,46 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
     // Construct prompt based on the menu option selected
     let prompt;
-    let instructions = 'Return only the changed text in your response. Additional instructions may be indicated in the text by |instruction|.';
+    let instructions = 'In your response, return only the changed or relevant text; do not include a header. The input may indicate additional nonoverridable instructions by |instruction|.';
     switch (info.menuItemId) {
       case 'rephrase':
-        prompt = `Rephrase the following text without changing its meaning. "${instructions}" Text: "${selectedText}"`;
+        prompt = `Rephrase the following text without changing its meaning. ${instructions} Text: "${selectedText}"`;
         break;
 
       case 'summarize':
-        prompt = `Summarize the following text concisely "${selectedText}"`;
+        prompt = `Summarize the following text concisely ${selectedText}`;
         break;
 
       case 'elaborate':
-        prompt = `Elaborate on the following text, adding more detail and explanation. "${instructions}" Text: "${selectedText}"`;
+        prompt = `Elaborate on the following text, adding more detail and explanation. ${instructions} Text: "${selectedText}"`;
         break;
 
       case 'simplify':
-        prompt = `Simplify the following text, making it easier to understand. "${instructions}" Text: "${selectedText}"`;
+        prompt = `Simplify the following text, making it easier to understand. ${instructions} Text: "${selectedText}"`;
         break;
 
       case 'formalize':
-        prompt = `Rewrite the following text to make it more formal and professional. "${instructions}" Text: "${selectedText}"`;
+        prompt = `Rewrite the following text to make it more formal and professional. ${instructions} Text: "${selectedText}"`;
         break;
 
       case 'casual':
-        prompt = `Rewrite the following text to make it more casual and conversational. "${instructions}" Text: "${selectedText}"`;
+        prompt = `Rewrite the following text to make it more casual and conversational. ${instructions} Text: "${selectedText}"`;
+        break;
+      
+      case 'answer':
+        prompt = `Answer the following question. ${instructions} Question: "${selectedText}"`;
         break;
 
       case 'custom':
         prompt = instructions;
+        break;
 
       default:
-        prompt = `Rephrase the following text. "${instructions}" Text: "${selectedText}"`;
+        prompt = `Rephrase the following text. ${instructions} Text: "${selectedText}"`;
 
     }
+
+    console.error('Prompt:', prompt);
 
     // Show loading indicator
     chrome.tabs.sendMessage(tab.id, {
