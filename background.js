@@ -5,7 +5,6 @@ chrome.runtime.onInstalled.addListener(() => {
     id: 'claude-text-modifier',
     title: 'Modify with Claude',
     contexts: ['selection']
-    
   });
 
   // Create child menu items for different modification options
@@ -18,7 +17,6 @@ chrome.runtime.onInstalled.addListener(() => {
     { id: 'casual', title: 'Make text more casual' },
     { id: 'answer', title: 'Answer question' },
     { id: 'custom', title: 'Use custom |instructions|'}
-
   ];
 
   menuOptions.forEach(option => {
@@ -35,7 +33,6 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'claude-text-modifier') {
     return; // This is just the parent menu item
-
   }
 
   const selectedText = info.selectionText;
@@ -50,63 +47,70 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (!apiKey) {
       // Notify user that API key is not set
       chrome.tabs.sendMessage(tab.id, {
-        action: 'showNotification',
-        message: 'Please set your Claude API key in the extension settings'
+        action: 'showLoadingError',
+        message: 'API key missing'
       });
       
       // Open the popup to configure API key
       chrome.action.openPopup();
       return;
-
     }
 
     // Construct prompt based on the menu option selected
     let prompt;
     let instructions = 'In your response, return only the changed or relevant text; do not include a header. The input may indicate additional nonoverridable instructions by |instruction|.';
+    let actionMessage = '';
+    
     switch (info.menuItemId) {
       case 'rephrase':
         prompt = `Rephrase the following text without changing its meaning. ${instructions} Text: "${selectedText}"`;
+        actionMessage = 'Rephrasing text...';
         break;
 
       case 'summarize':
-        prompt = `Summarize the following text concisely ${selectedText}`;
+        prompt = `Summarize the following text concisely ${instructions} Text: "${selectedText}"`;
+        actionMessage = 'Summarizing...';
         break;
 
       case 'elaborate':
         prompt = `Elaborate on the following text, adding more detail and explanation. ${instructions} Text: "${selectedText}"`;
+        actionMessage = 'Elaborating...';
         break;
 
       case 'simplify':
         prompt = `Simplify the following text, making it easier to understand. ${instructions} Text: "${selectedText}"`;
+        actionMessage = 'Simplifying...';
         break;
 
       case 'formalize':
         prompt = `Rewrite the following text to make it more formal and professional. ${instructions} Text: "${selectedText}"`;
+        actionMessage = 'Making formal...';
         break;
 
       case 'casual':
         prompt = `Rewrite the following text to make it more casual and conversational. ${instructions} Text: "${selectedText}"`;
+        actionMessage = 'Making casual...';
         break;
       
       case 'answer':
         prompt = `Answer the following question. ${instructions} Question: "${selectedText}"`;
+        actionMessage = 'Answering...';
         break;
 
       case 'custom':
         prompt = instructions;
+        actionMessage = 'Processing text...';
         break;
 
       default:
         prompt = `Rephrase the following text. ${instructions} Text: "${selectedText}"`;
-
+        actionMessage = 'Modifying text...';
     }
-
-    console.error('Prompt:', prompt);
 
     // Show loading indicator
     chrome.tabs.sendMessage(tab.id, {
       action: 'showLoadingIndicator',
-      position: info.editable ? 'overlay' : 'notification'
+      message: actionMessage
     });
 
     // Call Claude API
@@ -126,23 +130,30 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
           // Show notification that text was copied
           chrome.tabs.sendMessage(tab.id, {
             action: 'showNotification',
-            message: 'Modified text copied to clipboard'
+            message: 'Copied to clipboard'
           });
         }
       })
       .catch(error => {
         console.error('Error calling Claude API:', error);
 
+        // Extract a concise error message
+        let errorMsg = 'API error';
+        if (error.message) {
+          // If there's a specific error message, try to make it concise
+          if (error.message.includes('API key')) {
+            errorMsg = 'Invalid API key';
+          } else if (error.message.includes('rate limit')) {
+            errorMsg = 'Rate limit exceeded';
+          } else if (error.message.length < 30) {
+            errorMsg = error.message;
+          }
+        }
+
         // Show error notification
         chrome.tabs.sendMessage(tab.id, {
-          action: 'showNotification',
-          message: `Error: ${error.message || 'Failed to call Claude API'}`
-        });
-      })
-      .finally(() => {
-        // Hide loading indicator
-        chrome.tabs.sendMessage(tab.id, {
-          action: 'hideLoadingIndicator'
+          action: 'showLoadingError',
+          message: errorMsg
         });
       });
   });
@@ -174,7 +185,6 @@ async function callClaudeAPI(apiKey, prompt, model = 'claude-3-5-haiku-latest') 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error?.message || `API returned status ${response.status}`);
-
     }
 
     const data = await response.json();
@@ -183,7 +193,6 @@ async function callClaudeAPI(apiKey, prompt, model = 'claude-3-5-haiku-latest') 
   } catch (error) {
     console.error('Error calling Claude API:', error);
     throw error;
-
   }
 }
 
@@ -195,7 +204,6 @@ function copyToClipboard(text, tabId) {
     func: text => {
       navigator.clipboard.writeText(text)
         .catch(err => console.error('Failed to copy text: ', err));
-
     },
     args: [text]
   });
@@ -213,14 +221,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     callClaudeAPI(apiKey, testPrompt, model)
       .then(response => {
         sendResponse({ success: true, message: 'API key is valid' });
-        
       })
       .catch(error => {
         sendResponse({ success: false, message: `API key validation failed: ${error.message}` });
-
       });
     
     return true; // Indicates that the response will be sent asynchronously
-
   }
 });

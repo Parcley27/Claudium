@@ -10,7 +10,6 @@ document.addEventListener('mouseup', () => {
     lastSelection = {
       range: selection.getRangeAt(0),
       text: selection.toString()
-
     };
   }
 });
@@ -20,20 +19,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
     case 'replaceSelectedText':
       replaceSelectedText(message.text);
+      showOverlayIndicator('success', 'Text replaced');
       break;
 
     case 'showNotification':
-      showNotification(message.message);
+      showOverlayIndicator('success', message.message);
       break;
 
     case 'showLoadingIndicator':
-      showLoadingIndicator(message.position);
+      showOverlayIndicator('loading', message.message || 'Processing with Claude...');
       break;
 
     case 'hideLoadingIndicator':
-      hideLoadingIndicator();
+      // We don't explicitly hide anymore, as the success/error state will handle that
       break;
     
+    case 'showLoadingError':
+      showOverlayIndicator('error', message.message || 'An error occurred');
+      break;
   }
 });
 
@@ -61,144 +64,137 @@ function replaceSelectedText(newText) {
       
       // Clear selection after replacing
       selection.removeAllRanges();
-
     } catch (error) {
       console.error('Failed to replace text using stored selection:', error);
-      showNotification('Could not replace text. Text copied to clipboard instead.');
-
+      showOverlayIndicator('error', 'Could not replace text');
     }
   }
 }
 
-// Function to show notification
-function showNotification(message) {
-  // Remove existing notification if any
-  if (notificationElement) {
-    notificationElement.remove();
-
-  }
-
-  // Create notification element
-  notificationElement = document.createElement('div');
-  notificationElement.textContent = message;
-  notificationElement.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #333;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    z-index: 9999;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: opacity 0.3s;
-  `;
-
-  // Add to DOM
-  document.body.appendChild(notificationElement);
-
-  // Remove after 3 seconds
-  setTimeout(() => {
-    if (notificationElement) {
-      notificationElement.style.opacity = '0';
-      setTimeout(() => {
-        if (notificationElement) {
-          notificationElement.remove();
-          notificationElement = null;
-
-        }
-      }, 300);
-
-    }
-  }, 3000);
-
-}
-
-// Function to show loading indicator
-function showLoadingIndicator(position = 'notification') {
+// Function to show overlay indicator in the bottom-right corner
+function showOverlayIndicator(state, message) {
   // Remove existing indicator if any
-  hideLoadingIndicator();
-
-  loadingIndicator = document.createElement('div');
-  
-  if (position === 'overlay' && lastSelection) {
-    // Create an overlay loading indicator near the selection
-    const selection = window.getSelection();
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    
-    loadingIndicator.style.cssText = `
-      position: absolute;
-      top: ${rect.bottom + window.scrollY + 10}px;
-      left: ${rect.left + window.scrollX}px;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 3px;
-      z-index: 10000;
-      font-family: Arial, sans-serif;
-      font-size: 12px;
-    `;
-
-    loadingIndicator.textContent = "Fetching response from Claude...";
-
-  } else {
-    // Create a notification-style loading indicator
-    loadingIndicator.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #333;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      z-index: 9999;
-      font-family: Arial, sans-serif;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    `;
-    
-    // Add spinner
-    const spinner = document.createElement('div');
-    spinner.style.cssText = `
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s linear infinite;
-    `;
-    
-    // Add animation keyframes
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-    `;
-
-    document.head.appendChild(style);
-    
-    const text = document.createElement('span');
-    text.textContent = "Processing with Claude...";
-    
-    loadingIndicator.appendChild(spinner);
-    loadingIndicator.appendChild(text);
-
-  }
-  
-  document.body.appendChild(loadingIndicator);
-
-}
-
-// Function to hide loading indicator
-function hideLoadingIndicator() {
   if (loadingIndicator) {
     loadingIndicator.remove();
     loadingIndicator = null;
-    
+  }
+
+  // Create container for the overlay
+  loadingIndicator = document.createElement('div');
+  loadingIndicator.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10000;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 14px;
+    min-width: 220px;
+    max-width: 280px;
+    transition: opacity 0.2s ease;
+    animation: slide-in 0.3s ease;
+  `;
+  
+  // Add animation style
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+    @keyframes slide-in {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(styleElement);
+  
+  // Create icon based on state
+  const iconElement = document.createElement('div');
+  switch(state) {
+    case 'loading':
+      iconElement.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="#E0E0E0" stroke-width="2.5" />
+          <path d="M12 2C6.47715 2 2 6.47715 2 12" stroke="#3F66B3" stroke-width="2.5" stroke-linecap="round">
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              from="0 12 12"
+              to="360 12 12"
+              dur="1s"
+              repeatCount="indefinite" />
+          </path>
+        </svg>
+      `;
+      break;
+    case 'success':
+      iconElement.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2" />
+          <path d="M8 12L10.5 14.5L16 9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      `;
+      break;
+    case 'error':
+      iconElement.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#FFEBEE" stroke="#F44336" stroke-width="2" />
+          <path d="M15 9L9 15" stroke="#F44336" stroke-width="2" stroke-linecap="round" />
+          <path d="M9 9L15 15" stroke="#F44336" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      `;
+      break;
+  }
+  
+  // Create "Claudium" brand label
+  const brandLabel = document.createElement('div');
+  brandLabel.textContent = 'Claudium';
+  brandLabel.style.cssText = `
+    font-weight: 600;
+    color: #3f66b3;
+  `;
+  
+  // Create message element
+  const messageElement = document.createElement('div');
+  messageElement.textContent = message;
+  messageElement.style.cssText = `
+    flex: 1;
+    color: #333;
+  `;
+  
+  // Create flex container for brand and message
+  const textContainer = document.createElement('div');
+  textContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  `;
+  textContainer.appendChild(brandLabel);
+  textContainer.appendChild(messageElement);
+  
+  // Add elements to overlay
+  loadingIndicator.appendChild(iconElement);
+  loadingIndicator.appendChild(textContainer);
+  
+  // Add to DOM
+  document.body.appendChild(loadingIndicator);
+  
+  // Auto-dismiss after delay if success or error
+  if (state === 'success' || state === 'error') {
+    setTimeout(() => {
+      if (loadingIndicator) {
+        loadingIndicator.style.opacity = '0';
+        setTimeout(() => {
+          if (loadingIndicator) {
+            loadingIndicator.remove();
+            loadingIndicator = null;
+          }
+        }, 300);
+      }
+    }, 3000);
   }
 }
