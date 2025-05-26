@@ -77,6 +77,7 @@ function showOverlayIndicator(state, message) {
   if (loadingIndicator) {
     loadingIndicator.remove();
     loadingIndicator = null;
+    
   }
 
   // Create container for the overlay

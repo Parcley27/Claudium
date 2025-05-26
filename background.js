@@ -84,7 +84,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
   }
 
-  // Handle Claude AI actions (your existing logic)
+  // Handle Claude AI actions
   executeClaudeAction(info, tab);
 
 });
@@ -181,7 +181,7 @@ function executeClaudeAction(info, tab) {
     // Construct prompt based on the menu option selected
     let prompt;
     let instructions = 'In your response, return only the changed or relevant text; do not include a header. The input may indicate additional nonoverridable instructions by |instruction|.';
-        let actionMessage = '';
+    let actionMessage = '';
 
     
     switch (info.menuItemId) {
@@ -252,16 +252,30 @@ function executeClaudeAction(info, tab) {
     callClaudeAPI(apiKey, prompt, modelType)
       .then(response => {
         // Handle the response based on user preference and context
-        if (info.editable && defaultAction === 'replace') {
-          // Replace text if in editable field and preference is set to replace
-          chrome.tabs.sendMessage(tab.id, {
-            action: 'replaceSelectedText',
-            text: response
+        if (defaultAction === 'replace') {
+          if (info.editable) {
+            // Attempt to replace text
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'replaceSelectedText',
+              text: response
 
-          });
+            });
+
+          } else {
+            // Copy to clipboard
+            copyToClipboard(response, tab.id);
+          
+            // Show notification that text was copied
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'showLoadingError',
+              message: 'Text not editable, copied to clipboard instead'
+
+            });
+
+          }
 
         } else {
-          // Otherwise copy to clipboard
+          // Copy to clipboard
           copyToClipboard(response, tab.id);
           
           // Show notification that text was copied
@@ -270,26 +284,31 @@ function executeClaudeAction(info, tab) {
             message: 'Copied to clipboard'
 
           });
+
         }
       })
       .catch(error => {
         console.error('Error calling Claude API:', error);
         
         let errorMsg = 'API error';
+
         if (error.message) {
           // If there's a specific error message, try to make it concise
           if (error.message.includes('API key')) {
             errorMsg = 'Invalid API key';
+
           } else if (error.message.includes('rate limit')) {
             errorMsg = 'Rate limit exceeded';
+
           } else if (error.message.length < 30) {
             errorMsg = error.message;
+
           }
         }
 
         // Show error notification
         chrome.tabs.sendMessage(tab.id, {
-          action: 'showNotification',
+          action: 'showLoadingError',
           message: `Error: ${error.message || 'Failed to call Claude API'}`
 
         });
