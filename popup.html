@@ -38,20 +38,6 @@
       <section class="settings-section">
         <h2>Behaviour Settings</h2>
         <div class="form-group">
-          <label>Default action:</label>
-          <div class="checkbox-group">
-            <label class="radio-label">
-              <input type="radio" name="defaultAction" value="copy" checked>
-              Copy to clipboard
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="defaultAction" value="replace">
-              Replace text (when possible)
-            </label>
-          </div>
-        </div>
-        
-        <div class="form-group">
           <label>Model:</label>
           <div class="checkbox-group">
             <label class="radio-label">
@@ -61,6 +47,20 @@
             <label class="radio-label">
               <input type="radio" name="modelType" value="claude-sonnet-4-20250514">
               Smart & Powerful (Sonnet 4, more expensive)
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Default action:</label>
+          <div class="checkbox-group">
+            <label class="radio-label">
+              <input type="radio" name="defaultAction" value="copy" checked>
+              Copy to clipboard
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="defaultAction" value="replace">
+              Replace text (when possible)
             </label>
           </div>
         </div>
@@ -84,7 +84,7 @@
     
     <footer>
       <div class="status-message" id="statusMessage"></div>
-      <div class="version">v0.0.6</div>
+      <div class="version">v1.0.1</div>
     </footer>
   </div>
   
