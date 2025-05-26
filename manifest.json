@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Claudium",
-    "version": "0.0.10",
+    "version": "1.0.0",
     "description": "Adds text modification options, including Claude AI rephrasing to the right-click menu",
     "permissions": [
       "contextMenus",
