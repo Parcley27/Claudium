@@ -56,9 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         });
       } else {
-        // Default to haiku if not set
+        // Default to sonnet if not set
         modelTypeRadios.forEach(radio => {
-          if (radio.value === 'claude-3-5-haiku-latest') {
+          if (radio.value === 'claude-sonnet-4-5') {
             radio.checked = true;
 
           }
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     testApiKeyButton.disabled = true;
     
     // Get selected model type for testing
-    let selectedModel = 'claude-3-5-haiku-latest'; // Default
+    let selectedModel = 'claude-sonnet-4-5'; // Default
     modelTypeRadios.forEach(radio => {
       if (radio.checked) {
         selectedModel = radio.value;
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to save model type
   function saveModelType() {
-    let modelType = 'claude-3-5-haiku-latest'; // Default
+    let modelType = 'claude-sonnet-4-5'; // Default
     modelTypeRadios.forEach(radio => {
       if (radio.checked) {
         modelType = radio.value;

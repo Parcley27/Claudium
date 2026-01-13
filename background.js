@@ -162,7 +162,7 @@ function executeClaudeAction(info, tab) {
   chrome.storage.sync.get(['apiKey', 'defaultAction', 'modelType'], (data) => {
     const apiKey = data.apiKey;
     const defaultAction = data.defaultAction || 'copy'; // Default to copy if not set
-    const modelType = data.modelType || 'claude-3-5-haiku-latest'; // Default to haiku if not set
+    const modelType = data.modelType || 'claude-sonnet-4-5'; // Default to haiku if not set
 
     if (!apiKey) {
       // Notify user that API key is not set
@@ -324,7 +324,7 @@ function executeClaudeAction(info, tab) {
 }
 
 // Function to call Claude API
-async function callClaudeAPI(apiKey, prompt, model = 'claude-3-5-haiku-latest') {
+async function callClaudeAPI(apiKey, prompt, model = 'claude-sonnet-4-5') {
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -385,7 +385,7 @@ function copyToClipboard(text, tabId) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'testApiKey') {
     const apiKey = message.apiKey;
-    const model = message.model || 'claude-3-5-haiku-latest';
+    const model = message.model || 'claude-sonnet-4-5';
     
     // Simple test prompt
     const testPrompt = 'Say "API key is working correctly" if you can read this message.';
