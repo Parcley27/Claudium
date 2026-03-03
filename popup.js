@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         // Default to sonnet if not set
         modelTypeRadios.forEach(radio => {
-          if (radio.value === 'claude-sonnet-4-5') {
+          if (radio.value === 'claude-sonnet-4-6') {
             radio.checked = true;
 
           }
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     testApiKeyButton.disabled = true;
     
     // Get selected model type for testing
-    let selectedModel = 'claude-sonnet-4-5'; // Default
+    let selectedModel = 'claude-sonnet-4-6'; // Default
     modelTypeRadios.forEach(radio => {
       if (radio.checked) {
         selectedModel = radio.value;
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to save model type
   function saveModelType() {
-    let modelType = 'claude-sonnet-4-5'; // Default
+    let modelType = 'claude-sonnet-4-6'; // Default
     modelTypeRadios.forEach(radio => {
       if (radio.checked) {
         modelType = radio.value;

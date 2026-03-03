@@ -53,8 +53,8 @@ To use this extension, you need a Claude API key:
 
 ### Tokens and Costs
 1. While Claude is a relativly expensive model compared to some others, typical use of this extension only costs between $0.05 and $0.10 USD per month with Claude Haiku 3.5
-    1. At the time of writing, Claude Haiku 3.5 costs $0.80/MTok in and $4.00/MTok out. Claude Sonnet 4 costs $3.00/MTok in and $15.00/MTok out.
-2. Anthropic may have gifted $5 worth of tokens when you made your account. This amount of tokens will be able to generate ~4 years of use with Haiku 3.5, unless the tokens expire.
+    1. At the time of writing, Claude Haiku 4.5 costs $0.80/MTok in and $4.00/MTok out. Claude Sonnet 4.6 costs $3.00/MTok in and $15.00/MTok out.
+2. Anthropic may have gifted $5 worth of tokens when you made your account. 
 3. Responses are capped at 1000 tokens output, with typical output around . Since 1 token is \~4 english letters, you can expect a cost of \~75 Tok/100 words, or \~250 Tok per typical responce (\~330 words).
 
 ## Final Notes
